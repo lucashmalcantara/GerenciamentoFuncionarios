@@ -24,92 +24,31 @@ namespace GerenciamentoFuncionarios.Controllers
             return View(await _context.Funcionarios.ToListAsync());
         }
 
-        // GET: Funcionario/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var funcionario = await _context.Funcionarios
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (funcionario == null)
-            {
-                return NotFound();
-            }
-
-            return View(funcionario);
-        }
-
         // GET: Funcionario/Create
-        public IActionResult Create()
+        public IActionResult AdicionarOuEditar(int id = 0)
         {
-            return View();
+            if (id == 0)
+                return View(new Funcionario());
+
+            return View(_context.Funcionarios.Find(id));
         }
 
         // POST: Funcionario/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,NomeCompleto,Codigo,Posicao,LocalizacaoEscritorio")] Funcionario funcionario)
+        [ValidateAntiForgeryToken] // O atributo do tipo Bind é responsável por corresponder os valores do formulário para as propriedades definidas no model.
+        public async Task<IActionResult> AdicionarOuEditar([Bind("Id,NomeCompleto,Codigo,Posicao,LocalizacaoEscritorio")] Funcionario funcionario)
         {
+            // Para a validação do lado do servidor, usamos a seguinte propriedade: ModelState.IsValid.
             if (ModelState.IsValid)
             {
-                _context.Add(funcionario);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(funcionario);
-        }
-
-        // GET: Funcionario/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var funcionario = await _context.Funcionarios.FindAsync(id);
-            if (funcionario == null)
-            {
-                return NotFound();
-            }
-            return View(funcionario);
-        }
-
-        // POST: Funcionario/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,NomeCompleto,Codigo,Posicao,LocalizacaoEscritorio")] Funcionario funcionario)
-        {
-            if (id != funcionario.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
+                if (funcionario.Id == 0)
+                    _context.Add(funcionario);
+                else
                     _context.Update(funcionario);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!FuncionarioExists(funcionario.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(funcionario);
@@ -118,35 +57,10 @@ namespace GerenciamentoFuncionarios.Controllers
         // GET: Funcionario/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var funcionario = await _context.Funcionarios
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (funcionario == null)
-            {
-                return NotFound();
-            }
-
-            return View(funcionario);
-        }
-
-        // POST: Funcionario/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
             var funcionario = await _context.Funcionarios.FindAsync(id);
             _context.Funcionarios.Remove(funcionario);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool FuncionarioExists(int id)
-        {
-            return _context.Funcionarios.Any(e => e.Id == id);
         }
     }
 }
