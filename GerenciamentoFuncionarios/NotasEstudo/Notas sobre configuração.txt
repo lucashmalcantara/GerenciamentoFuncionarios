@@ -1,0 +1,8 @@
+Comandos Migration
+
+	Add-Migration "CriacaoInicial"
+	Update-database
+	
+Controllers
+
+	MVC Controller with views using Entity Framework
